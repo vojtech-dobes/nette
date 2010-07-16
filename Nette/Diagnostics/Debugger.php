@@ -449,7 +449,20 @@ final class Debugger
 			error_reporting(E_ALL | E_STRICT);
 		}
 
-		if (self::$lastError !== FALSE && ($severity & error_reporting()) === $severity) { // tryError mode
+		if ($severity === E_WARNING || $severity === E_RECOVERABLE_ERROR) { // convert to exception?
+			$trace = debug_backtrace(FALSE);
+			if (isset($trace[2]['function'])) {
+				try {
+					$func = $trace[2]['function'];
+					$func = isset($trace[2]['class']) ? new \ReflectionMethod($trace[2]['class'], $func) : new \ReflectionFunction($func);
+					if (strpos($func->getDocComment(), '@warnings')) {
+						throw new \ErrorException($message, 0, $severity, $file, $line);
+					}
+				} catch (\ReflectionException $e) {
+				}
+		}
+
+		if (self::$lastError !== FALSE) { // tryError mode
 			self::$lastError = new \ErrorException($message, 0, $severity, $file, $line);
 			return NULL;
 		}
