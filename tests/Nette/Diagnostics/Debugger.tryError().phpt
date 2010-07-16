@@ -15,19 +15,49 @@ use Nette\Diagnostics\Debugger;
 require __DIR__ . '/../bootstrap.php';
 
 
+function test1()
+{
+	try {
+		rename('..', '..'); // E_WARNING
+	} catch (\ErrorException $e) {
+		return $e;
+	}
+}
 
-Debugger::tryError(); {
-	$a++;
-} $res = Debugger::catchError($e);
+/** @warnings */
+function test2()
+{
+	try {
+		rename('..', '..'); // E_WARNING
+	} catch (\ErrorException $e) {
+		return $e;
+	}
+}
 
-Assert::true( $res );
-Assert::same( "Undefined variable: a", $e->getMessage() );
+/** @warnings */
+function test3()
+{
+	try {
+		@rename('..', '..'); // E_WARNING
+	} catch (\ErrorException $e) {
+		return $e;
+	}
+}
 
+/** @warnings */
+function test4()
+{
+	try {
+		$a++;
+	} catch (\ErrorException $e) {
+		return $e;
+	}
+}
 
+Assert::null( test1() );
 
-Debugger::tryError(); {
+Assert::true( test2() instanceof \ErrorException );
 
-} $res = Debugger::catchError($e);
+Assert::true( test3() instanceof \ErrorException );
 
-Assert::false( $res );
-Assert::null( $e );
+Assert::null( test4() );

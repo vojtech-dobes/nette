@@ -48,18 +48,19 @@ final class Json
 	 * Returns the JSON representation of a value.
 	 * @param  mixed
 	 * @return string
+	 * @warnings
 	 */
 	public static function encode($value)
 	{
-		Nette\Diagnostics\Debugger::tryError();
-		if (function_exists('ini_set')) {
-			$old = ini_set('display_errors', 0); // needed to receive 'Invalid UTF-8 sequence' error
-			$json = json_encode($value);
-			ini_set('display_errors', $old);
-		} else {
-			$json = json_encode($value);
-		}
-		if (Nette\Diagnostics\Debugger::catchError($e)) { // needed to receive 'recursion detected' error
+		try {
+			if (function_exists('ini_set')) {
+				$old = ini_set('display_errors', 0); // needed to receive 'Invalid UTF-8 sequence' error
+				$json = json_encode($value);
+				ini_set('display_errors', $old);
+			} else {
+				$json = json_encode($value);
+			}
+		} catch (\ErrorException $e) { // receives 'recursion detected' error
 			throw new JsonException($e->getMessage());
 		}
 		return $json;

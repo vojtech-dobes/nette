@@ -462,11 +462,6 @@ final class Debugger
 				}
 		}
 
-		if (self::$lastError !== FALSE) { // tryError mode
-			self::$lastError = new \ErrorException($message, 0, $severity, $file, $line);
-			return NULL;
-		}
-
 		if ($severity === E_RECOVERABLE_ERROR || $severity === E_USER_ERROR) {
 			throw new Nette\FatalErrorException($message, 0, $severity, $file, $line, $context);
 
@@ -525,36 +520,6 @@ final class Debugger
 
 
 	/**
-	 * Starts catching potential errors/warnings.
-	 * @return void
-	 */
-	public static function tryError()
-	{
-		if (!self::$enabled && self::$lastError === FALSE) {
-			set_error_handler(array(__CLASS__, '_errorHandler'));
-		}
-		self::$lastError = NULL;
-	}
-
-
-
-	/**
-	 * Returns catched error/warning message.
-	 * @param  \ErrorException  catched error
-	 * @return bool
-	 */
-	public static function catchError(& $error)
-	{
-		if (!self::$enabled && self::$lastError !== FALSE) {
-			restore_error_handler();
-		}
-		$error = self::$lastError;
-		self::$lastError = FALSE;
-		return (bool) $error;
-	}
-
-
-
 	/********************* useful tools ****************d*g**/
 
 

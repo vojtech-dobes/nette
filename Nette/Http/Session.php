@@ -60,6 +60,7 @@ class Session extends Nette\Object
 	 * Starts and initializes session data.
 	 * @throws Nette\InvalidStateException
 	 * @return void
+	 * @warnings
 	 */
 	public function start()
 	{
@@ -72,9 +73,9 @@ class Session extends Nette\Object
 
 		$this->configure($this->options);
 
-		Nette\Diagnostics\Debugger::tryError();
-		session_start();
-		if (Nette\Diagnostics\Debugger::catchError($e)) {
+		try {
+			session_start();
+		} catch (\ErrorException $e) {
 			@session_write_close(); // this is needed
 			throw new Nette\InvalidStateException('session_start(): ' . $e->getMessage(), 0, $e);
 		}

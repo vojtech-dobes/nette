@@ -27,6 +27,7 @@ class SendmailMailer extends Nette\Object implements IMailer
 	 * Sends email.
 	 * @param  Message
 	 * @return void
+	 * @warnings
 	 */
 	public function send(Message $mail)
 	{
@@ -36,20 +37,18 @@ class SendmailMailer extends Nette\Object implements IMailer
 
 		$parts = explode(Message::EOL . Message::EOL, $tmp->generateMessage(), 2);
 
-		Nette\Diagnostics\Debugger::tryError();
-		$res = mail(
-			str_replace(Message::EOL, PHP_EOL, $mail->getEncodedHeader('To')),
-			str_replace(Message::EOL, PHP_EOL, $mail->getEncodedHeader('Subject')),
-			str_replace(Message::EOL, PHP_EOL, $parts[1]),
-			str_replace(Message::EOL, PHP_EOL, $parts[0])
-		);
-
-		if (Nette\Diagnostics\Debugger::catchError($e)) {
-			throw new Nette\InvalidStateException('mail(): ' . $e->getMessage(), 0, $e);
-
-		} elseif (!$res) {
-			throw new Nette\InvalidStateException('Unable to send email.');
-		}
+		try {
+			if (!mail(
+				str_replace(Message::EOL, PHP_EOL, $mail->getEncodedHeader('To')),
+				str_replace(Message::EOL, PHP_EOL, $mail->getEncodedHeader('Subject')),
+				str_replace(Message::EOL, PHP_EOL, $parts[1]),
+				str_replace(Message::EOL, PHP_EOL, $parts[0])
+					)) {
+				throw new Nette\InvalidStateException('Unable to send email.');
+			}
+		} catch (\ErrorException $e) {
+			throw new Nette\InvalidStateException($e->getMessage());
+	}
 	}
 
 }

@@ -49,6 +49,7 @@ final class IniAdapter implements IAdapter
 	 * @param  string  file name
 	 * @return array
 	 * @throws Nette\InvalidStateException
+	 * @warnings
 	 */
 	public static function load($file)
 	{
@@ -56,11 +57,7 @@ final class IniAdapter implements IAdapter
 			throw new Nette\FileNotFoundException("File '$file' is missing or is not readable.");
 		}
 
-		Nette\Diagnostics\Debugger::tryError();
 		$ini = parse_ini_file($file, TRUE);
-		if (Nette\Diagnostics\Debugger::catchError($e)) {
-			throw new Nette\InvalidStateException('parse_ini_file(): ' . $e->getMessage(), 0, $e);
-		}
 
 		$separator = trim(self::$sectionSeparator);
 		$data = array();

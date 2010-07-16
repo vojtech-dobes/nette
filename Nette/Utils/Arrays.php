@@ -164,13 +164,20 @@ final class Arrays
 	 * @param  string
 	 * @param  int
 	 * @return array
+	 * @warnings
 	 */
 	public static function grep(array $arr, $pattern, $flags = 0)
 	{
-		Nette\Diagnostics\Debugger::tryError();
-		$res = preg_grep($pattern, $arr, $flags);
-		Strings::catchPregError($pattern);
-		return $res;
+		try {
+			$res = preg_grep($pattern, $arr, $flags);
+			if ($code = preg_last_error()) {
+				throw new RegexpException(RegexpException::$messages[$code] . " (pattern: $pattern)", $code); // run-time error
+			}
+			return $res;
+
+		} catch (\ErrorException $e) {
+			throw new RegexpException($e->getMessage() . " in pattern: $pattern"); // compile-time error
+		}
 	}
 
 }
