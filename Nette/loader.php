@@ -53,6 +53,26 @@ require_once __DIR__ . '/Diagnostics/Helpers.php';
 
 Nette\Loaders\NetteLoader::getInstance()->register();
 
+function netteErrorHandler($severity, $message, $file, $line)
+{
+	if ($severity === E_WARNING || $severity === E_RECOVERABLE_ERROR) { // convert to exception?
+		$trace = debug_backtrace(FALSE);
+		if (isset($trace[2]['function'])) {
+			try {
+				$func = $trace[2]['function'];
+				$func = isset($trace[2]['class']) ? new ReflectionMethod($trace[2]['class'], $func) : new ReflectionFunction($func);
+				if (strpos($func->getDocComment(), '@warnings')) {
+					throw new ErrorException($message, 0, $severity, $file, $line);
+				}
+			} catch (ReflectionException $e) {
+			}
+		}
+	}
+	return FALSE; // calls normal error handler
+}
+
+set_error_handler('netteErrorHandler');
+
 Nette\Utils\SafeStream::register();
 
 
