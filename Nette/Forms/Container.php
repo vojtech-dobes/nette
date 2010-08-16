@@ -378,11 +378,11 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 * Adds button used to submit form.
 	 * @param  string  control name
 	 * @param  string  caption
-	 * @return Nette\Forms\Controls\SubmitButton
+	 * @return Nette\Forms\Controls\Button
 	 */
 	public function addSubmit($name, $caption = NULL)
 	{
-		$control = new Controls\SubmitButton;
+		$control = new Controls\Button;
 		$control->setRenderer(new DefaultButtonRenderer($control, $caption, 'submit'));
 		return $this[$name] = $control;
 	}
@@ -409,11 +409,11 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 * @param  string  control name
 	 * @param  string  URI of the image
 	 * @param  string  alternate text for the image
-	 * @return Nette\Forms\Controls\ImageButton
+	 * @return Nette\Forms\Controls\Button
 	 */
 	public function addImage($name, $src = NULL, $alt = NULL)
 	{
-		$control = new Controls\ImageButton;
+		$control = new Controls\Button;
 		$control->setRenderer(new DefaultButtonRenderer($control, $alt, 'image', $src));
 		return $this[$name] = $control;
 	}
