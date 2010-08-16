@@ -262,7 +262,7 @@ final class Rules extends Nette\Object implements \IteratorAggregate
 		}
 		$message = vsprintf(preg_replace('#%(name|label|value)#', '%$0', $message), (array) $rule->arg);
 		$message = str_replace('%name', $rule->control->getName(), $message);
-		$message = str_replace('%label', $rule->control->translate($rule->control->caption), $message);
+		$message = str_replace('%label', $rule->control->getRenderer()->translate($rule->control->getRenderer()->caption), $message);
 		if ($withValue && strpos($message, '%value') !== FALSE) {
 			$message = str_replace('%value', $rule->control->getValue(), $message);
 		}

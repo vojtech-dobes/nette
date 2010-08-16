@@ -32,6 +32,9 @@ abstract class TextBase extends BaseControl
 	/** @var array */
 	protected $filters = array();
 
+	/** @var int */
+	public $maxLength;
+
 
 
 	/**
@@ -57,7 +60,7 @@ abstract class TextBase extends BaseControl
 		foreach ($this->filters as $filter) {
 			$value = (string) $filter/*5.2*->invoke*/($value);
 		}
-		return $value === $this->translate($this->emptyValue) ? '' : $value;
+		return $value === /*$this->getRenderer()->translate*/($this->emptyValue) ? '' : $value; // TODO
 	}
 
 
@@ -95,24 +98,6 @@ abstract class TextBase extends BaseControl
 	{
 		$this->filters[] = callback($filter);
 		return $this;
-	}
-
-
-
-	public function getControl()
-	{
-		$control = parent::getControl();
-		foreach ($this->getRules() as $rule) {
-			if ($rule->type === Nette\Forms\Rule::VALIDATOR && !$rule->isNegative
-				&& ($rule->operation === Form::LENGTH || $rule->operation === Form::MAX_LENGTH)
-			) {
-				$control->maxlength = is_array($rule->arg) ? $rule->arg[1] : $rule->arg;
-			}
-		}
-		if ($this->emptyValue !== '') {
-			$control->data('nette-empty-value', $this->translate($this->emptyValue));
-		}
-		return $control;
 	}
 
 

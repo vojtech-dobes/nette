@@ -25,17 +25,6 @@ class UploadControl extends BaseControl
 {
 
 	/**
-	 * @param  string  label
-	 */
-	public function __construct($label = NULL)
-	{
-		parent::__construct($label);
-		$this->control->type = 'file';
-	}
-
-
-
-	/**
 	 * This method will be called when the component (or component's parent)
 	 * becomes attached to a monitored object. Do not call this method yourself.
 	 * @param  Nette\Forms\IComponent

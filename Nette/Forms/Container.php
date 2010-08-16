@@ -234,7 +234,10 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addText($name, $label = NULL, $cols = NULL, $maxLength = NULL)
 	{
-		return $this[$name] = new Controls\TextInput($label, $cols, $maxLength);
+		$control = new Controls\TextInput($maxLength);
+		$control->setRenderer(new DefaultInputControlRenderer($control, $label));
+		$control->getRenderer()->getElementPrototype()->cols = $cols;
+		return $this[$name] = $control;
 	}
 
 
@@ -249,8 +252,10 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addPassword($name, $label = NULL, $cols = NULL, $maxLength = NULL)
 	{
-		$control = new Controls\TextInput($label, $cols, $maxLength);
+		$control = new Controls\TextInput($maxLength);
 		$control->setType('password');
+		$control->setRenderer(new DefaultInputControlRenderer($control, $label));
+		$control->getRenderer()->getElementPrototype()->cols = $cols;
 		return $this[$name] = $control;
 	}
 
@@ -266,7 +271,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addTextArea($name, $label = NULL, $cols = 40, $rows = 10)
 	{
-		return $this[$name] = new Controls\TextArea($label, $cols, $rows);
+		$control = new Controls\TextArea;
+		$control->setRenderer(new DefaultTextAreaRenderer($control, $label, $cols, $rows));
+		return $this[$name] = $control;
 	}
 
 
@@ -279,7 +286,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addFile($name, $label = NULL)
 	{
-		return $this[$name] = new Controls\UploadControl($label);
+		$control = new Controls\FileUpload;
+		$control->setRenderer(new DefaultInputControlRenderer($control, $label));
+		return $this[$name] = $control;
 	}
 
 
@@ -294,6 +303,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	{
 		$control = new Controls\HiddenField;
 		$control->setDefaultValue($default);
+		$control->setRenderer(new DefaultInputControlRenderer($control));
 		return $this[$name] = $control;
 	}
 
@@ -307,7 +317,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addCheckbox($name, $caption = NULL)
 	{
-		return $this[$name] = new Controls\Checkbox($caption);
+		$control = new Controls\Checkbox;
+		$control->setRenderer(new DefaultInputControlRenderer($control, $caption));
+		return $this[$name] = $control;
 	}
 
 
@@ -321,7 +333,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addRadioList($name, $label = NULL, array $items = NULL)
 	{
-		return $this[$name] = new Controls\RadioList($label, $items);
+		$control = new Controls\RadioList($items);
+		$control->setRenderer(new DefaultRadioListRenderer($control, $label));
+		return $this[$name] = $control;
 	}
 
 
@@ -336,7 +350,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addSelect($name, $label = NULL, array $items = NULL, $size = NULL)
 	{
-		return $this[$name] = new Controls\SelectBox($label, $items, $size);
+		$control = new Controls\SelectBox($items);
+		$control->setRenderer(new DefaultSelectControlRenderer($control, $label, $size));
+		return $this[$name] = $control;
 	}
 
 
@@ -351,7 +367,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addMultiSelect($name, $label = NULL, array $items = NULL, $size = NULL)
 	{
-		return $this[$name] = new Controls\MultiSelectBox($label, $items, $size);
+		$control = new Controls\MultiSelectBox($items);
+		$control->setRenderer(new DefaultSelectControlRenderer($control, $label, $size));
+		return $this[$name] = $control;
 	}
 
 
@@ -364,7 +382,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addSubmit($name, $caption = NULL)
 	{
-		return $this[$name] = new Controls\SubmitButton($caption);
+		$control = new Controls\SubmitButton;
+		$control->setRenderer(new DefaultButtonRenderer($control, $caption, 'submit'));
+		return $this[$name] = $control;
 	}
 
 
@@ -377,7 +397,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addButton($name, $caption)
 	{
-		return $this[$name] = new Controls\Button($caption);
+		$control = new Controls\Button;
+		$control->setRenderer(new DefaultButtonRenderer($control, $label, 'button'));
+		return $this[$name] = $control;
 	}
 
 
@@ -391,7 +413,9 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 */
 	public function addImage($name, $src = NULL, $alt = NULL)
 	{
-		return $this[$name] = new Controls\ImageButton($src, $alt);
+		$control = new Controls\ImageButton;
+		$control->setRenderer(new DefaultButtonRenderer($control, $alt, 'image', $src));
+		return $this[$name] = $control;
 	}
 
 

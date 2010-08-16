@@ -123,6 +123,7 @@ class Form extends Container
 		$this->monitor(__CLASS__);
 		if ($name !== NULL) {
 			$tracker = new Controls\HiddenField($name);
+			$tracker->setRenderer(new DefaultInputControlRenderer($tracker));
 			$tracker->unmonitor(__CLASS__);
 			$this[self::TRACKER_ID] = $tracker;
 		}
@@ -225,6 +226,7 @@ class Form extends Container
 		}
 		$session->setExpiration($timeout, $key);
 		$this[self::PROTECTOR_ID] = new Controls\HiddenField($token);
+		$this[self::PROTECTOR_ID]->setRenderer(new DefaultInputControlRenderer($this[self::PROTECTOR_ID]));
 		$this[self::PROTECTOR_ID]->addRule(self::PROTECTION, $message, $token);
 	}
 

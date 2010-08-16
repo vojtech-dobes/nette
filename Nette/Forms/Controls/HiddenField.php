@@ -23,27 +23,15 @@ use Nette;
 class HiddenField extends BaseControl
 {
 	/** @var string */
-	private $forcedValue;
+	public $forcedValue;
 
 
 
 	public function __construct($forcedValue = NULL)
 	{
 		parent::__construct();
-		$this->control->type = 'hidden';
 		$this->value = (string) $forcedValue;
 		$this->forcedValue = $forcedValue;
-	}
-
-
-
-	/**
-	 * Bypasses label generation.
-	 * @return void
-	 */
-	public function getLabel($caption = NULL)
-	{
-		return NULL;
 	}
 
 
@@ -57,19 +45,6 @@ class HiddenField extends BaseControl
 	{
 		$this->value = is_scalar($value) ? (string) $value : '';
 		return $this;
-	}
-
-
-
-	/**
-	 * Generates control's HTML element.
-	 * @return Nette\Utils\Html
-	 */
-	public function getControl()
-	{
-		return parent::getControl()
-			->value($this->forcedValue === NULL ? $this->value : $this->forcedValue)
-			->data('nette-rules', NULL);
 	}
 
 }

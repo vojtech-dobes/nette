@@ -23,13 +23,9 @@ use Nette;
 class Checkbox extends BaseControl
 {
 
-	/**
-	 * @param  string  label
-	 */
-	public function __construct($label = NULL)
+	public function __construct()
 	{
-		parent::__construct($label);
-		$this->control->type = 'checkbox';
+		parent::__construct();
 		$this->value = FALSE;
 	}
 
@@ -44,17 +40,6 @@ class Checkbox extends BaseControl
 	{
 		$this->value = is_scalar($value) ? (bool) $value : FALSE;
 		return $this;
-	}
-
-
-
-	/**
-	 * Generates control's HTML element.
-	 * @return Nette\Utils\Html
-	 */
-	public function getControl()
-	{
-		return parent::getControl()->checked($this->value);
 	}
 
 }

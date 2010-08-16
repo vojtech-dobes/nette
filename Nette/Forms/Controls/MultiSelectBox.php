@@ -95,17 +95,4 @@ class MultiSelectBox extends SelectBox
 		return parent::getHtmlName() . '[]';
 	}
 
-
-
-	/**
-	 * Generates control's HTML element.
-	 * @return Nette\Utils\Html
-	 */
-	public function getControl()
-	{
-		$control = parent::getControl();
-		$control->multiple = TRUE;
-		return $control;
-	}
-
 }

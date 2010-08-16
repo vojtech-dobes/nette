@@ -22,20 +22,22 @@ use Nette;
  */
 class TextInput extends TextBase
 {
+	/** @var int */
+	public $minValue;
+
+	/** @var int */
+	public $maxValue;
+
+
 
 	/**
-	 * @param  string  control name
-	 * @param  string  label
-	 * @param  int  width of the control
 	 * @param  int  maximum number of characters the user may enter
 	 */
-	public function __construct($label = NULL, $cols = NULL, $maxLength = NULL)
+	public function __construct($maxLength = NULL)
 	{
-		parent::__construct($label);
-		$this->control->type = 'text';
-		$this->control->size = $cols;
-		$this->control->maxlength = $maxLength;
+		parent::__construct();
 		$this->filters[] = callback($this, 'sanitize');
+		$this->maxLength = $maxLength;
 		$this->value = '';
 	}
 
@@ -47,57 +49,20 @@ class TextInput extends TextBase
 	 */
 	public function sanitize($value)
 	{
-		if ($this->control->maxlength && Nette\Utils\Strings::length($value) > $this->control->maxlength) {
-			$value = iconv_substr($value, 0, $this->control->maxlength, 'UTF-8');
+		if ($this->maxLength && Nette\Utils\Strings::length($value) > $this->maxLength) {
+			$value = iconv_substr($value, 0, $this->maxLength, 'UTF-8');
 		}
 		return Nette\Utils\Strings::trim(strtr($value, "\r\n", '  '));
 	}
 
 
 
-	/**
-	 * Changes control's type attribute.
-	 * @param  string
-	 * @return BaseControl  provides a fluent interface
-	 */
+	/** @deprecated */
 	public function setType($type)
 	{
-		$this->control->type = $type;
+		//trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->setType() instead.', E_USER_WARNING);
+		$this->getRenderer()->setType($type);
 		return $this;
-	}
-
-
-
-	/** @deprecated */
-	public function setPasswordMode($mode = TRUE)
-	{
-		$this->control->type = $mode ? 'password' : 'text';
-		return $this;
-	}
-
-
-
-	/**
-	 * Generates control's HTML element.
-	 * @return Nette\Utils\Html
-	 */
-	public function getControl()
-	{
-		$control = parent::getControl();
-		foreach ($this->getRules() as $rule) {
-			if ($rule->isNegative || $rule->type !== Nette\Forms\Rule::VALIDATOR) {
-
-			} elseif ($rule->operation === Nette\Forms\Form::RANGE && $control->type !== 'text') {
-				list($control->min, $control->max) = $rule->arg;
-
-			} elseif ($rule->operation === Nette\Forms\Form::PATTERN) {
-				$control->pattern = $rule->arg;
-			}
-		}
-		if ($control->type !== 'password') {
-			$control->value = $this->getValue() === '' ? $this->translate($this->emptyValue) : $this->value;
-		}
-		return $control;
 	}
 
 }

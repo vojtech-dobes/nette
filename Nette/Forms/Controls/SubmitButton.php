@@ -37,17 +37,6 @@ class SubmitButton extends Button implements Nette\Forms\ISubmitterControl
 
 
 	/**
-	 * @param  string  caption
-	 */
-	public function __construct($caption = NULL)
-	{
-		parent::__construct($caption);
-		$this->control->type = 'submit';
-	}
-
-
-
-	/**
 	 * Sets 'pressed' indicator.
 	 * @param  bool
 	 * @return SubmitButton  provides a fluent interface
@@ -85,7 +74,6 @@ class SubmitButton extends Button implements Nette\Forms\ISubmitterControl
 	{
 		// TODO: implement groups
 		$this->validationScope = (bool) $scope;
-		$this->control->formnovalidate = !$this->validationScope;
 		return $this;
 	}
 

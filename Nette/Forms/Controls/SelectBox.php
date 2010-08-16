@@ -42,15 +42,11 @@ class SelectBox extends BaseControl
 
 
 	/**
-	 * @param  string  label
 	 * @param  array   items from which to choose
-	 * @param  int     number of rows that should be visible
 	 */
-	public function __construct($label = NULL, array $items = NULL, $size = NULL)
+	public function __construct(array $items = NULL)
 	{
-		parent::__construct($label);
-		$this->control->setName('select');
-		$this->control->size = $size > 1 ? (int) $size : NULL;
+		parent::__construct();
 		if ($items !== NULL) {
 			$this->setItems($items);
 		}
@@ -200,48 +196,6 @@ class SelectBox extends BaseControl
 			$value = $this->getValue();
 			return $value === NULL ? NULL : $this->allowed[$value];
 		}
-	}
-
-
-
-	/**
-	 * Generates control's HTML element.
-	 * @return Nette\Utils\Html
-	 */
-	public function getControl()
-	{
-		$control = parent::getControl();
-		if ($this->skipFirst) {
-			reset($this->items);
-			$control->data('nette-empty-value', $this->useKeys ? key($this->items) : current($this->items));
-		}
-		$selected = $this->getValue();
-		$selected = is_array($selected) ? array_flip($selected) : array($selected => TRUE);
-		$option = Nette\Utils\Html::el('option');
-
-		foreach ($this->items as $key => $value) {
-			if (!is_array($value)) {
-				$value = array($key => $value);
-				$dest = $control;
-
-			} else {
-				$dest = $control->create('optgroup')->label($key);
-			}
-
-			foreach ($value as $key2 => $value2) {
-				if ($value2 instanceof Nette\Utils\Html) {
-					$dest->add((string) $value2->selected(isset($selected[$key2])));
-
-				} else {
-					$key2 = $this->useKeys ? $key2 : $value2;
-					$value2 = $this->translate((string) $value2);
-					$dest->add((string) $option->value($key2 === $value2 ? NULL : $key2)
-						->selected(isset($selected[$key2]))
-						->setText($value2));
-				}
-			}
-		}
-		return $control;
 	}
 
 }

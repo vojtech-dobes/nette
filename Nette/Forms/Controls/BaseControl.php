@@ -25,36 +25,17 @@ use Nette,
  * @author     David Grudl
  *
  * @property-read Nette\Forms\Form $form
- * @property-read mixed $control
- * @property-read mixed $label
  * @property-read string $htmlName
- * @property   string $htmlId
- * @property-read array $options
- * @property   Nette\Localization\ITranslator $translator
  * @property   mixed $value
- * @property-read Nette\Utils\Html $controlPrototype
- * @property-read Nette\Utils\Html $labelPrototype
- * @property-read Nette\Forms\Rules $rules
+ * @property-read Rules $rules
  * @property-read array $errors
  * @property   bool $disabled
  * @property   bool $required
 */
 abstract class BaseControl extends Nette\ComponentModel\Component implements IControl
 {
-	/** @var string */
-	public static $idMask = 'frm%s-%s';
-
-	/** @var string textual caption or label */
-	public $caption;
-
 	/** @var mixed unfiltered control value */
 	protected $value;
-
-	/** @var Nette\Utils\Html  control element template */
-	protected $control;
-
-	/** @var Nette\Utils\Html  label element template */
-	protected $label;
 
 	/** @var array */
 	private $errors = array();
@@ -63,32 +44,22 @@ abstract class BaseControl extends Nette\ComponentModel\Component implements ICo
 	private $disabled = FALSE;
 
 	/** @var string */
-	private $htmlId;
-
-	/** @var string */
 	private $htmlName;
 
 	/** @var Nette\Forms\Rules */
 	private $rules;
 
-	/** @var Nette\Localization\ITranslator */
-	private $translator = TRUE; // means autodetect
-
-	/** @var array user options */
-	private $options = array();
-
+	/** @var DefaultControlRenderer */
+	private $renderer;
 
 
 	/**
 	 * @param  string  caption
 	 */
-	public function __construct($caption = NULL)
+	public function __construct()
 	{
 		$this->monitor('Nette\Forms\Form');
 		parent::__construct();
-		$this->control = Html::el('input');
-		$this->label = Html::el('label');
-		$this->caption = $caption;
 		$this->rules = new Nette\Forms\Rules($this);
 	}
 
@@ -147,84 +118,78 @@ abstract class BaseControl extends Nette\ComponentModel\Component implements ICo
 	 * @param  string new ID, or FALSE or NULL
 	 * @return BaseControl  provides a fluent interface
 	 */
+	public function setRenderer($renderer)
+	{
+		$this->renderer = $renderer;
+		return $this;
+	}
+
+
+
+	/**
+	 * Returns control rendering helper.
+	 * @return DefaultControlRenderer
+	 */
+	public function getRenderer()
+	{
+		return $this->renderer;
+	}
+
+
+
+	/** @deprecated */
 	public function setHtmlId($id)
 	{
-		$this->htmlId = $id;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		$this->renderer->setHtmlId($id);
 		return $this;
-	}
+		}
 
 
 
-	/**
-	 * Returns control's HTML id.
-	 * @return string
-	 */
+	/** @deprecated */
 	public function getHtmlId()
 	{
-		if ($this->htmlId === FALSE) {
-			return NULL;
-
-		} elseif ($this->htmlId === NULL) {
-			$this->htmlId = sprintf(self::$idMask, $this->getForm()->getName(), $this->lookupPath('Nette\Forms\Form'));
-		}
-		return $this->htmlId;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		return $this->renderer->getHtmlId();
 	}
 
 
 
-	/**
-	 * Changes control's HTML attribute.
-	 * @param  string name
-	 * @param  mixed  value
-	 * @return BaseControl  provides a fluent interface
-	 */
+	/** @deprecated */
 	public function setAttribute($name, $value = TRUE)
 	{
-		$this->control->$name = $value;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		$this->renderer->setAttribute($name, $value);
 		return $this;
 	}
 
 
 
-	/**
-	 * Sets user-specific option.
-	 * @param  string key
-	 * @param  mixed  value
-	 * @return BaseControl  provides a fluent interface
-	 */
+	/** @deprecated */
 	public function setOption($key, $value)
 	{
-		if ($value === NULL) {
-			unset($this->options[$key]);
-
-		} else {
-			$this->options[$key] = $value;
-		}
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		$this->renderer->setOption($key, $value);
 		return $this;
 	}
 
 
 
-	/**
-	 * Returns user-specific option.
-	 * @param  string key
-	 * @param  mixed  default value
-	 * @return mixed
-	 */
+	/** @deprecated */
 	final public function getOption($key, $default = NULL)
 	{
-		return isset($this->options[$key]) ? $this->options[$key] : $default;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		return $this->renderer->getOption($key, $default);
 	}
 
 
 
-	/**
-	 * Returns user-specific options.
-	 * @return array
-	 */
+	/** @deprecated */
 	final public function getOptions()
 	{
-		return $this->options;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		return $this->renderer->getOptions();
 	}
 
 
@@ -233,43 +198,30 @@ abstract class BaseControl extends Nette\ComponentModel\Component implements ICo
 
 
 
-	/**
-	 * Sets translate adapter.
-	 * @param  Nette\Localization\ITranslator
-	 * @return BaseControl  provides a fluent interface
-	 */
+	/** @deprecated */
 	public function setTranslator(Nette\Localization\ITranslator $translator = NULL)
 	{
-		$this->translator = $translator;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		$this->renderer->setTranslator($translator);
 		return $this;
 	}
 
 
 
-	/**
-	 * Returns translate adapter.
-	 * @return Nette\Localization\ITranslator|NULL
-	 */
+	/** @deprecated */
 	final public function getTranslator()
 	{
-		if ($this->translator === TRUE) {
-			return $this->getForm(FALSE) ? $this->getForm()->getTranslator() : NULL;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		return $this->renderer->getTranslator();
 		}
-		return $this->translator;
-	}
 
 
 
-	/**
-	 * Returns translated string.
-	 * @param  string
-	 * @param  int      plural count
-	 * @return string
-	 */
+	/** @deprecated */
 	public function translate($s, $count = NULL)
 	{
-		$translator = $this->getTranslator();
-		return $translator === NULL || $s == NULL ? $s : $translator->translate($s, $count); // intentionally ==
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		return $this->renderer->translate($s, $count);
 	}
 
 
@@ -369,72 +321,38 @@ abstract class BaseControl extends Nette\ComponentModel\Component implements ICo
 
 
 
-	/**
-	 * Generates control's HTML element.
-	 * @return Nette\Utils\Html
-	 */
+	/** @deprecated */
 	public function getControl()
 	{
-		$this->setOption('rendered', TRUE);
-
-		$control = clone $this->control;
-		$control->name = $this->getHtmlName();
-		$control->disabled = $this->disabled;
-		$control->id = $this->getHtmlId();
-		$control->required = $this->isRequired();
-
-		$rules = self::exportRules($this->rules);
-		$rules = substr(json_encode($rules), 1, -1);
-		$rules = preg_replace('#"([a-z0-9]+)":#i', '$1:', $rules);
-		$rules = preg_replace('#(?<!\\\\)"([^\\\\\',]*)"#i', "'$1'", $rules);
-		$control->data('nette-rules', $rules ? $rules : NULL);
-
-		return $control;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		return $this->renderer->getControl();
 	}
 
 
 
-	/**
-	 * Generates label's HTML element.
-	 * @param  string
-	 * @return Nette\Utils\Html
-	 */
+	/** @deprecated */
 	public function getLabel($caption = NULL)
 	{
-		$label = clone $this->label;
-		$label->for = $this->getHtmlId();
-		if ($caption !== NULL) {
-			$label->setText($this->translate($caption));
-
-		} elseif ($this->caption instanceof Html) {
-			$label->add($this->caption);
-
-		} else {
-			$label->setText($this->translate($this->caption));
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		return $this->renderer->getLabel($caption);
 		}
-		return $label;
-	}
 
 
 
-	/**
-	 * Returns control's HTML element template.
-	 * @return Nette\Utils\Html
-	 */
+	/** @deprecated */
 	final public function getControlPrototype()
 	{
-		return $this->control;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->getElementPrototype() instead.', E_USER_WARNING);
+		return $this->renderer->getControlPrototype();
 	}
 
 
 
-	/**
-	 * Returns label's HTML element template.
-	 * @return Nette\Utils\Html
-	 */
+	/** @deprecated */
 	final public function getLabelPrototype()
 	{
-		return $this->label;
+		// trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->' . __FUNCTION__ . '() instead.', E_USER_WARNING);
+		return $this->renderer->getLabelPrototype();
 	}
 
 
