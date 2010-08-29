@@ -75,7 +75,7 @@ class TestCase
 		// pre-skip?
 		if (isset($this->options['skip'])) {
 			$message = $this->options['skip'] ? $this->options['skip'] : 'No message.';
-			throw new TestCaseException($message, TestCaseException::SKIPPED);
+			throw new TestCaseException($message, TestCaseException::SKIPPED, $this->getName(), $this->file);
 
 		} elseif (isset($this->options['phpversion'])) {
 			$operator = '>=';
@@ -84,7 +84,7 @@ class TestCase
 				$operator = $matches[1];
 			}
 			if (version_compare($this->options['phpversion'], $this->phpVersion, $operator)) {
-				throw new TestCaseException("Requires PHP $operator {$this->options['phpversion']}.", TestCaseException::SKIPPED);
+				throw new TestCaseException("Requires PHP $operator {$this->options['phpversion']}.", TestCaseException::SKIPPED, $this->getName(), $this->file);
 			}
 		}
 
@@ -94,7 +94,7 @@ class TestCase
 		if (isset($this->options['assertcode'])) {
 			$code = isset($this->headers['Status']) ? (int) $this->headers['Status'] : 200;
 			if ($code !== (int) $this->options['assertcode']) {
-				throw new TestCaseException('Expected HTTP code ' . $this->options['assertcode'] . ' is not same as actual code ' . $code);
+				throw new TestCaseException('Expected HTTP code ' . $this->options['assertcode'] . ' is not same as actual code ' . $code, 0, $this->getName(), $this->file);
 			}
 		}
 	}
@@ -177,13 +177,13 @@ class TestCase
 		}
 
 		if ($res === self::CODE_ERROR) {
-			throw new TestCaseException("Fatal error");
+			throw new TestCaseException("Fatal error", 0, $this->getName(), $this->file);
 
 		} elseif ($res === self::CODE_FAIL) {
-			throw new TestCaseException($line);
+			throw new TestCaseException($line, 0, $this->getName(), $this->file);
 
 		} elseif ($res === self::CODE_SKIP) { // skip
-			throw new TestCaseException($line, TestCaseException::SKIPPED);
+			throw new TestCaseException($line, TestCaseException::SKIPPED, $this->getName(), $this->file);
 
 		} elseif ($res !== self::CODE_OK) {
 			throw new Exception("Unable to execute '$command'.");
@@ -200,6 +200,17 @@ class TestCase
 	public function getName()
 	{
 		return $this->options['name'];
+	}
+
+
+
+	/**
+	 * Returns test file.
+	 * @return string
+	 */
+	public function getFile()
+	{
+		return $this->file;
 	}
 
 
@@ -261,5 +272,35 @@ class TestCase
 class TestCaseException extends Exception
 {
 	const SKIPPED = 1;
+
+	/** @var string */
+	private $testName;
+
+	/** @var string */
+	private $testFile;
+
+
+	public function __construct($message = NULL, $code = 0, $testName = NULL, $testFile = NULL)
+	{
+		parent::__construct($message, $code);
+		$this->testName = $testName;
+		$this->testFile = $testFile;
+	}
+
+
+
+	/** @return string */
+	public function getTestName()
+	{
+		return $this->testName;
+	}
+
+
+
+	/** @return string */
+	public function getTestFile()
+	{
+		return $this->testFile;
+	}
 
 }

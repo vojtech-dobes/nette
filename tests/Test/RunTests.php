@@ -19,6 +19,7 @@ Options:
 	-d key=val  Define INI entry 'key' with value 'val'.
 	-l <path>   Specify path to shared library files (LD_LIBRARY_PATH)
 	-s          Show information about skipped tests
+	-j <n>      Number of jobs to run
 
 <?php
 }
