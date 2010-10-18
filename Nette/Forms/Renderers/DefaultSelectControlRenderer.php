@@ -25,6 +25,10 @@ use Nette,
 */
 class DefaultSelectControlRenderer extends DefaultLabeledControlRenderer
 {
+	/** @var string */
+	private $firstItem;
+
+		
 
 	public function __construct(IControl $control, $caption = NULL, $size = NULL)
 	{
@@ -34,6 +38,19 @@ class DefaultSelectControlRenderer extends DefaultLabeledControlRenderer
 
 
 
+	/**
+	 * Sets first ignored item.
+	 * @param  string
+	 * @return DefaultSelectControlRenderer  provides a fluent interface
+	 */
+	public function setFirstItem($item)
+	{
+		$this->firstItem = $item;
+		return $this;
+	}
+	
+	
+	
 	/**
 	 * Generates control's HTML element.
 	 * @param  string
@@ -46,9 +63,9 @@ class DefaultSelectControlRenderer extends DefaultLabeledControlRenderer
 		$element->multiple = $this->control instanceof Controls\MultiSelectBox;
 		$items = $this->control->getItems();
 		$useKeys = $this->control->areKeysUsed();
-		if ($this->control->isFirstSkipped()) {
-			reset($items);
-			$element->data['nette-empty-value'] = $useKeys ? key($items) : current($items);
+		if ($this->firstItem !== NULL) {
+			$items = array('' => $this->firstItem) + $items;
+			$element->data['nette-empty-value'] = $useKeys ? '' : $this->firstItem;
 		}
 		$selected = $this->control->getValue();
 		$selected = is_array($selected) ? array_flip($selected) : array($selected => TRUE);

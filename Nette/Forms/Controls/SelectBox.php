@@ -23,7 +23,6 @@ use Nette;
  * @property-read mixed $rawValue
  * @property   array $items
  * @property-read mixed $selectedItem
- * @property-read bool $firstSkipped
  */
 class SelectBox extends BaseControl
 {
@@ -32,9 +31,6 @@ class SelectBox extends BaseControl
 
 	/** @var array */
 	protected $allowed = array();
-
-	/** @var bool */
-	private $skipFirst = FALSE;
 
 	/** @var bool */
 	private $useKeys = TRUE;
@@ -60,12 +56,7 @@ class SelectBox extends BaseControl
 	 */
 	public function getValue()
 	{
-		$allowed = $this->allowed;
-		if ($this->skipFirst) {
-			$allowed = array_slice($allowed, 1, count($allowed), TRUE);
-		}
-
-		return is_scalar($this->value) && isset($allowed[$this->value]) ? $this->value : NULL;
+		return is_scalar($this->value) && isset($this->allowed[$this->value]) ? $this->value : NULL;
 	}
 
 
@@ -93,34 +84,12 @@ class SelectBox extends BaseControl
 
 
 
-	/**
-	 * Ignores the first item in select box.
-	 * @param  string
-	 * @return SelectBox  provides a fluent interface
-	 */
+	/** @deprecated */
 	public function skipFirst($item = NULL)
 	{
-		if (is_bool($item)) {
-			$this->skipFirst = $item;
-		} else {
-			$this->skipFirst = TRUE;
-			if ($item !== NULL) {
-				$this->items = array('' => $item) + $this->items;
-				$this->allowed = array('' => '') + $this->allowed;
-			}
-		}
+		trigger_error(__METHOD__ . '() is deprecated; use getRenderer()->setFirstItem(...) instead.', E_USER_WARNING);
+		$this->getRenderer()->setFirstItem($item);
 		return $this;
-	}
-
-
-
-	/**
-	 * Is first item in select box ignored?
-	 * @return bool
-	 */
-	final public function isFirstSkipped()
-	{
-		return $this->skipFirst;
 	}
 
 
