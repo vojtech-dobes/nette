@@ -346,11 +346,11 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 * @param  string  label
 	 * @param  array   items from which to choose
 	 * @param  int     number of rows that should be visible
-	 * @return Nette\Forms\Controls\SelectBox
+	 * @return Nette\Forms\Controls\ChoiceControl
 	 */
 	public function addSelect($name, $label = NULL, array $items = NULL, $size = NULL)
 	{
-		$control = new Controls\SelectBox($items);
+		$control = new Controls\ChoiceControl($items);
 		$control->setRenderer(new DefaultSelectControlRenderer($control, $label, $size));
 		return $this[$name] = $control;
 	}
@@ -363,11 +363,11 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	 * @param  string  label
 	 * @param  array   options from which to choose
 	 * @param  int     number of rows that should be visible
-	 * @return Nette\Forms\Controls\MultiSelectBox
+	 * @return Nette\Forms\Controls\MultiChoiceControl
 	 */
 	public function addMultiSelect($name, $label = NULL, array $items = NULL, $size = NULL)
 	{
-		$control = new Controls\MultiSelectBox($items);
+		$control = new Controls\MultiChoiceControl($items);
 		$control->setRenderer(new DefaultSelectControlRenderer($control, $label, $size));
 		return $this[$name] = $control;
 	}

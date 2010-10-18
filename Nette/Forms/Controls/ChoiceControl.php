@@ -16,7 +16,7 @@ use Nette;
 
 
 /**
- * Select box control that allows single item selection.
+ * Control which allows choise between items.
  *
  * @author     David Grudl
  *
@@ -24,7 +24,7 @@ use Nette;
  * @property   array $items
  * @property-read mixed $selectedItem
  */
-class SelectBox extends BaseControl
+class ChoiceControl extends BaseControl
 {
 	/** @var array */
 	private $items = array();
@@ -108,7 +108,7 @@ class SelectBox extends BaseControl
 	/**
 	 * Sets items from which to choose.
 	 * @param  array
-	 * @return SelectBox  provides a fluent interface
+	 * @return ChoiceControl  provides a fluent interface
 	 */
 	public function setItems(array $items, $useKeys = TRUE)
 	{

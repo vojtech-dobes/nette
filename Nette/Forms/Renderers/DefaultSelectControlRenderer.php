@@ -60,7 +60,7 @@ class DefaultSelectControlRenderer extends DefaultLabeledControlRenderer
 	{
 		$element = parent::getControl($caption);
 		$element->setName('select');
-		$element->multiple = $this->control instanceof Controls\MultiSelectBox;
+		$element->multiple = $this->control instanceof Controls\MultiChoiceControl;
 		$items = $this->control->getItems();
 		$useKeys = $this->control->areKeysUsed();
 		if ($this->firstItem !== NULL) {

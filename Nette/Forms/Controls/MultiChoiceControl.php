@@ -16,11 +16,11 @@ use Nette;
 
 
 /**
- * Select box control that allows multiple item selection.
+ * Control which allows multiple choise between multiple items.
  *
  * @author     David Grudl
  */
-class MultiSelectBox extends SelectBox
+class MultiChoiceControl extends ChoiceControl
 {
 
 
