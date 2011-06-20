@@ -327,8 +327,8 @@ final class Environment
 
 
 	/**
-	 * Loads global configuration from file and process it.
-	 * @param  string
+	 * Loads global configuration from file/s and process it.
+	 * @param  mixed config file or array of config files
 	 * @param  string
 	 * @return Nette\ArrayHash
 	 */

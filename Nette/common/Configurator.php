@@ -32,6 +32,9 @@ class Configurator extends Object
 	/** @var DI\Container */
 	private $container;
 
+	/** @var array */
+	private $files = array();
+
 
 	public function __construct($containerClass = 'Nette\DI\Container')
 	{
@@ -67,19 +70,32 @@ class Configurator extends Object
 
 
 	/**
-	 * Loads configuration from file and process it.
+	 * Loads configuration from file/s and process it.
+	 * @param  mixed config file or array of config files
+	 * @param  string
 	 * @return void
 	 */
 	public function loadConfig($file, $section = NULL)
 	{
-		if ($file === NULL) {
-			$file = $this->defaultConfigFile;
+		$this->files = is_array($file) ? $file : array($file);
+		$this->load($section);
+	}
+
+
+
+	private function load($section = NULL)
+	{
+		if (count($this->files) === 0 || $this->files[0] === NULL) {
+			$this->files[0] = $this->defaultConfigFile;
 		}
 		$container = $this->container;
-		$file = $container->expand($file);
-		if (!is_file($file)) {
-			$file = preg_replace('#\.neon$#', '.ini', $file); // back compatibility
-		}
+		$this->files = array_map(function ($file) use ($container) {
+			$file = $container->expand($file);
+			if (!is_file($file)) {
+				$file = preg_replace('#\.neon$#', '.ini', $file); // back compatibility
+			}
+			return $file;
+		}, $this->files);
 		if ($section === NULL) {
 			if (PHP_SAPI === 'cli') {
 				$section = Environment::CONSOLE;
@@ -89,7 +105,7 @@ class Configurator extends Object
 		}
 
 		$cache = new Cache($container->templateCacheStorage, 'Nette.Configurator');
-		$cacheKey = array((array) $container->params, $file, $section);
+		$cacheKey = array((array) $container->params, $this->files, $section);
 		$cached = $cache->load($cacheKey);
 		if ($cached) {
 			require $cached['file'];
@@ -97,17 +113,45 @@ class Configurator extends Object
 			return;
 		}
 
-		$config = Nette\Config\Config::fromFile($file, $section);
-		$code = "<?php\n// source file $file\n\n";
+		$configs = array();
+		foreach ($this->files as $index => $file) {
+			$config = Nette\Config\Config::fromFile($file, $section);
 
-		// back compatibility with singular names
-		foreach (array('service', 'variable') as $item) {
-			if (isset($config[$item])) {
-				trigger_error(basename($file) . ": Section '$item' is deprecated; use plural form '{$item}s' instead.", E_USER_WARNING);
-				$config[$item . 's'] = $config[$item];
-				unset($config[$item]);
+			// back compatibility with singular names
+			foreach (array('service', 'variable') as $item) {
+				if (isset($config[$item])) {
+					trigger_error(basename($file) . ": Section '$item' is deprecated; use plural form '{$item}s' instead.", E_USER_WARNING);
+					$config[$item . 's'] = $config[$item];
+					unset($config[$item]);
+				}
 			}
+
+			// back compatibility with services named by interface
+			if (isset($config['services'])) {
+				foreach ($config['services'] as $key => & $def) {
+					if (preg_match('#^Nette\\\\.*\\\\I?([a-zA-Z]+)$#', strtr($key, '-', '\\'), $m)) { // back compatibility
+						$m[1][0] = strtolower($m[1][0]);
+						trigger_error(basename($file) . ": service name '$key' has been renamed to '$m[1]'", E_USER_WARNING);
+						$key = $m[1];
+					}
+				}
+			}
+
+			// set modes - back compatibility (just warning)
+			if (isset($config['mode'])) {
+				trigger_error(basename($file) . ": Section 'mode' is deprecated; use 'params' instead.", E_USER_WARNING);
+			}
+
+			$configs[] = $config;
 		}
+
+		$config = array();
+		$configs = array_reverse($configs);
+		foreach ($configs as $fileConfig) {
+			$config = Nette\Utils\Arrays::mergeTree($config, $fileConfig);
+		}
+
+		$code = "<?php\n// source files (next overrides previous):\n// ". implode("\n// ", $this->files) . "\n\n";
 
 		// add expanded variables
 		while (!empty($config['variables'])) {
@@ -127,12 +171,6 @@ class Configurator extends Object
 		// process services
 		if (isset($config['services'])) {
 			foreach ($config['services'] as $key => & $def) {
-				if (preg_match('#^Nette\\\\.*\\\\I?([a-zA-Z]+)$#', strtr($key, '-', '\\'), $m)) { // back compatibility
-					$m[1][0] = strtolower($m[1][0]);
-					trigger_error(basename($file) . ": service name '$key' has been renamed to '$m[1]'", E_USER_WARNING);
-					$key = $m[1];
-				}
-
 				if (is_scalar($def)) {
 					$def = array('class' => $def);
 				}
@@ -187,7 +225,6 @@ class Configurator extends Object
 
 		// set modes - back compatibility
 		if (isset($config['mode'])) {
-			trigger_error(basename($file) . ": Section 'mode' is deprecated; use 'params' instead.", E_USER_WARNING);
 			foreach ($config['mode'] as $mode => $state) {
 				$code .= $this->generateCode('$container->params[?] = ?', $mode . 'Mode', (bool) $state);
 			}
@@ -206,8 +243,9 @@ class Configurator extends Object
 		$code .= 'foreach ($container->getServiceNamesByTag("run") as $name => $foo) { $container->getService($name); }' . "\n";
 
 		$cache->save($cacheKey, $code, array(
-			Cache::FILES => $file,
+			Cache::FILES => $this->files,
 		));
+		$this->files = array();
 
 		Nette\Utils\LimitedScope::evaluate($code, array('container' => $container));
 	}
