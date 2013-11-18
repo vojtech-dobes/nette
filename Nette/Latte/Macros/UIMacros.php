@@ -47,7 +47,6 @@ class UIMacros extends MacroSet
 		$me->addMacro('extends', array($me, 'macroExtends'));
 		$me->addMacro('layout', array($me, 'macroExtends'));
 		$me->addMacro('block', array($me, 'macroBlock'), array($me, 'macroBlockEnd'));
-		$me->addMacro('#', array($me, 'macroBlock'), array($me, 'macroBlockEnd'));
 		$me->addMacro('define', array($me, 'macroBlock'), array($me, 'macroBlockEnd'));
 		$me->addMacro('snippet', array($me, 'macroBlock'), array($me, 'macroBlockEnd'));
 		$me->addMacro('ifset', array($me, 'macroIfset'), 'endif');
@@ -86,7 +85,7 @@ class UIMacros extends MacroSet
 	{
 		// try close last block
 		$last = $this->getCompiler()->getMacroNode();
-		if ($last && ($last->name === 'block' || $last->name === '#')) {
+		if ($last && $last->name === 'block') {
 			$this->getCompiler()->closeMacro($last->name);
 		}
 
