@@ -269,7 +269,7 @@ class SelectBox extends BaseControl
 	{
 		parent::validate();
 		if (!$this->isDisabled() && $this->prompt === FALSE && $this->getValue() === NULL) {
-			$this->addError(Nette\Forms\Validator::$messages[self::VALID]);
+			$this->addError(Nette\Forms\Rules::$defaultMessages[self::VALID]);
 		}
 	}
 
