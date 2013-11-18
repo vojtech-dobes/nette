@@ -214,7 +214,7 @@ class RadioList extends BaseControl
 			$label->setText($this->translate($caption));
 
 			$container->add($label->insert(0, $input) . $separator);
-			unset($input->attrs['data-nette-rules']);
+			$input->data('nette-rules', NULL);
 		}
 
 		return $container;

@@ -260,8 +260,7 @@ abstract class BaseControl extends Nette\ComponentModel\Component implements ICo
 			'id' => $this->getHtmlId(),
 			'required' => $this->isRequired(),
 			'disabled' => $this->isDisabled(),
-			'data-nette-rules' => $rules ? Nette\Utils\Json::encode($rules) : NULL,
-		));
+		))->data('nette-rules', $rules ? Nette\Utils\Json::encode($rules) : NULL);
 	}
 
 
