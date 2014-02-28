@@ -156,7 +156,7 @@ class Compiler extends Nette\Object
 	 */
 	public static function parseServices(ContainerBuilder $builder, array $config, $namespace = NULL)
 	{
-		if (!empty($config['factories'])) {
+		if (!empty($config['factories']) && $namespace === NULL) {
 			trigger_error("Section 'factories' is deprecated, move definitions to section 'services' and append key 'autowired: no'.", E_USER_DEPRECATED);
 		}
 
